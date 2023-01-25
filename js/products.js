@@ -12,29 +12,38 @@ createApp({
     methods: {
         getCookie(user) {
             var cookieArr = document.cookie.split(";");
-            for(var i = 0; i < cookieArr.length; i++) {
+            for (var i = 0; i < cookieArr.length; i++) {
                 var cookiePair = cookieArr[i].split("=");
-                if(user == cookiePair[0].trim()) {
+                if (user == cookiePair[0].trim()) {
                     return;
                 }
             }
             location.assign("login.html");
         },
+        checkUser() {
+            const token = document.cookie.replace(/(?:(?:^|.*;\s*)user\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+            axios.defaults.headers.common['Authorization'] = token; //每次(default)發出請求時，header加入此參數
+            axios.post(`${this.apiUrl}/api/user/check`)
+                .then((res) => {
+                    this.getData();
+                })
+                .catch((err) => {
+                    alert("請先登入平台");
+                    location.assign("login.html");
+                })
+        },
         getData() {
+            axios.defaults.headers.common['Authorization'] = document.cookie.replace(/(?:(?:^|.*;\s*)user\s*=\s*([^;]*).*$)|^.*$/, '$1');
             axios.get(`${this.apiUrl}/api/${this.apiPath}/admin/products`)
-            .then((res) => {
-                console.log(res);
-                this.products = res.data.products;
-                console.log(this.products.length);
-            })
-            .catch((err) => {
-                console.log(err);
-            })
+                .then((res) => {
+                    this.products = res.data.products;
+                })
+                .catch((err) => {
+                    console.log(err);
+                })
         }
     },
     mounted() {
-        this.getCookie("user");
-        axios.defaults.headers.common.Authorization = document.cookie.replace(/(?:(?:^|.*;\s*)user\s*=\s*([^;]*).*$)|^.*$/, '$1');
-        this.getData();
+        this.checkUser();
     }
 }).mount('#app');
