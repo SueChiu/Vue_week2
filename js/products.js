@@ -10,16 +10,6 @@ createApp({
         }
     },
     methods: {
-        getCookie(user) {
-            var cookieArr = document.cookie.split(";");
-            for (var i = 0; i < cookieArr.length; i++) {
-                var cookiePair = cookieArr[i].split("=");
-                if (user == cookiePair[0].trim()) {
-                    return;
-                }
-            }
-            location.assign("login.html");
-        },
         checkUser() {
             const token = document.cookie.replace(/(?:(?:^|.*;\s*)user\s*\=\s*([^;]*).*$)|^.*$/, "$1");
             axios.defaults.headers.common['Authorization'] = token; //每次(default)發出請求時，header加入此參數
